@@ -1,0 +1,125 @@
+/* BỐ CỤC KHUNG CHÍNH (ẢNH NỔI BẬT) */
+.featured-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 30px;
+    margin-bottom: 35px;
+}
+
+/* CỘT BÊN TRÁI: BÀI VIẾT LỚN */
+.featured-large {
+    cursor: pointer;
+}
+
+.featured-large .card-img-large {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+}
+
+.featured-large .card-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.3;
+    margin-top: 14px;
+    margin-bottom: 8px;
+}
+
+.featured-large .card-excerpt {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.5;
+}
+
+/* CỘT BÊN PHẢI: CÓ ĐƯỜNG KẺ NẠO DỌC TÁCH CỘT */
+.featured-right-col {
+    border-left: 1px solid #eee;
+    padding-left: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 3 BÀI NHỎ CÓ CHỮ BÊN TRÁI - ẢNH BÊN PHẢI - GẠCH NGANG BÊN DƯỚI */
+.right-small-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.right-small-item .item-title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.35;
+}
+
+.right-small-item .item-img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+/* BÀI TÂM ĐIỂM (BÀI THỨ 4 BÊN PHẢI CÓ ANH TÁC GIẢ TRÒN) */
+.tam-diem-box {
+    padding-top: 5px;
+    cursor: pointer;
+}
+
+.tam-diem-badge {
+    display: inline-block;
+    background: #f2f2f2;
+    color: #222;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.tam-diem-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.tam-diem-title {
+    flex: 1;
+    font-size: 17px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.35;
+}
+
+.tam-diem-author-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tam-diem-avatar {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tam-diem-author-name {
+    font-size: 12px;
+    color: #444;
+    font-weight: 600;
+    margin-top: 6px;
+    text-align: center;
+}
