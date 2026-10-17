@@ -3,7 +3,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height
 a { text-decoration: none; color: inherit; }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
 
-/* HEADER & NAVBAR GỐC */
+/* HEADER & NAVBAR */
 header { background: #008837; color: #fff; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 .nav-wrapper { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
 .logo { font-size: 24px; font-weight: bold; color: #fff; letter-spacing: 1px; cursor: pointer; }
@@ -20,80 +20,114 @@ header { background: #008837; color: #fff; position: sticky; top: 0; z-index: 10
 .dropdown-menu li a:hover { background: #f0f0f0 !important; color: #008837 !important; }
 
 /* MAIN CONTENT */
-main { padding: 30px 0; min-height: 75vh; }
+main { padding: 25px 0; min-height: 75vh; }
 
 .section-title {
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 25px;
-    border-bottom: 3px solid #008837;
-    display: inline-block;
-    padding-bottom: 5px;
-    text-transform: uppercase;
+    margin-bottom: 20px;
+    border-left: 5px solid #008837;
+    padding-left: 12px;
     color: #111;
+    line-height: 1.2;
 }
 
-/* TOP SECTION: 1 LỚN BÊN TRÁI + 2 NHỎ BÊN PHẢI */
+/* TIÊU ĐỀ CHUYÊN MỤC CÓ MŨI TÊN (THẾ GIỚI >) GIỐNG VIDEO */
+.category-section-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #008837;
+    margin: 35px 0 15px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.category-section-title .arrow {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* KHUNG 1 LỚN BÊN TRÁI + 2 NHỎ BÊN PHẢI */
 .featured-grid {
     display: grid;
     grid-template-columns: 1.8fr 1.2fr;
     gap: 25px;
-    margin-bottom: 35px;
-    padding-bottom: 25px;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 25px;
 }
 
-/* BÀI LỚN BÊN TRÁI */
-.card-featured-large { cursor: pointer; }
-.img-large {
-    width: 100%;
-    aspect-ratio: 16/10;
-    object-fit: cover;
-    border-radius: 4px;
-    display: block;
-    margin-bottom: 12px;
-}
-.title-large {
-    font-size: 22px;
-    font-weight: 700;
-    color: #111;
-    line-height: 1.35;
-    margin-bottom: 8px;
-}
-.excerpt-large {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.5;
-}
-
-/* 2 BÀI NHỎ BÊN PHẢI */
 .featured-small-group {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
-.card-featured-small { cursor: pointer; }
-.img-small {
+
+.card-clean {
+    cursor: pointer;
+    background: transparent;
+}
+
+.card-img-large {
     width: 100%;
-    aspect-ratio: 16/10;
+    aspect-ratio: 16/9;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: 8px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.card-img-small {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border-radius: 8px;
     display: block;
     margin-bottom: 8px;
 }
-.title-small {
-    font-size: 15px;
+
+.card-category-green {
+    font-size: 12px;
+    font-weight: 800;
+    color: #008837;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.card-title-large-green {
+    font-size: 22px;
+    font-weight: 800;
+    color: #008837;
+    line-height: 1.35;
+    margin-bottom: 8px;
+}
+
+.card-excerpt-clean {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.card-title-small-clean {
+    font-size: 16px;
     font-weight: 700;
     color: #111;
     line-height: 1.35;
+    margin-bottom: 6px;
 }
 
-/* DANH SÁCH BÀI CÒN LẠI (ẢNH BÊN TRÁI - TIÊU ĐỀ + SAPO BÊN PHẢI) */
+.card-time-clean {
+    font-size: 12px;
+    color: #888;
+}
+
+/* DANH SÁCH DẠNG LIST DỌC CÓ ẢNH BÊN TRÁI (00:01 TRONG VIDEO) */
 .recent-list {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    margin-bottom: 30px;
 }
+
 .list-item {
     display: flex;
     gap: 20px;
@@ -101,36 +135,80 @@ main { padding: 30px 0; min-height: 75vh; }
     border-bottom: 1px solid #eee;
     cursor: pointer;
 }
-.list-img {
-    width: 220px;
-    height: 130px;
+
+.list-item-img {
+    width: 200px;
+    height: 125px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: 8px;
     flex-shrink: 0;
 }
+
 .list-content {
     flex: 1;
 }
-.list-title {
-    font-size: 18px;
+
+.list-item-title {
+    font-size: 17px;
     font-weight: 700;
     color: #111;
     line-height: 1.35;
-    margin-bottom: 8px;
-}
-.list-excerpt {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.5;
+    margin: 4px 0 6px 0;
 }
 
-/* TRANG CHI TIẾT BÀI VIẾT */
-.article-detail { background: #fff; padding: 20px 0; }
-.article-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-.article-title-main { font-size: 28px; color: #111; margin-bottom: 12px; line-height: 1.3; }
-.article-meta-info { font-size: 14px; color: #666; display: flex; gap: 15px; flex-wrap: wrap; }
-.article-excerpt-main { font-weight: bold; font-size: 16px; margin-bottom: 20px; color: #333; line-height: 1.5; background: #f9f9f9; padding: 15px; border-left: 4px solid #008837; }
-.article-content-body { font-size: 16px; line-height: 1.8; color: #222; white-space: pre-line; }
+.list-item-excerpt {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.list-item-meta {
+    font-size: 12px;
+    color: #888;
+}
+
+/* TRANG CHI TIẾT BÀI VIẾT (00:13 TRONG VIDEO) */
+.article-detail {
+    background: #fff;
+    padding: 10px 0;
+}
+
+.article-title-main {
+    font-size: 30px;
+    font-weight: 800;
+    color: #111;
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+.article-meta-info {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 18px;
+}
+
+.article-sapo-main {
+    font-size: 16px;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.detail-main-img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.article-content-body {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #222;
+    white-space: pre-line;
+}
 
 /* TRANG CRAWLER */
 .crawler-box { background: #fff; padding: 25px; border-radius: 8px; border: 1px solid #eee; }
@@ -140,7 +218,7 @@ main { padding: 30px 0; min-height: 75vh; }
 .btn-submit { background: #008837; color: #fff; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; }
 .json-preview { background: #272822; color: #f8f8f2; padding: 15px; border-radius: 6px; overflow-x: auto; margin-top: 20px; font-family: monospace; font-size: 13px; }
 
-/* FOOTER */
+/* FOOTER WEBSITE */
 footer { background: #1b1e21; color: #aaa; padding: 40px 0 20px 0; margin-top: 50px; }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 30px; margin-bottom: 30px; }
 .footer-col h3, .footer-col h4 { color: #fff; margin-bottom: 15px; }
@@ -175,5 +253,5 @@ footer { background: #1b1e21; color: #aaa; padding: 40px 0 20px 0; margin-top: 5
     .nav-wrapper { flex-direction: column; gap: 10px; }
     .nav-menu { justify-content: center; }
     .list-item { flex-direction: column; }
-    .list-img { width: 100%; height: 200px; }
+    .list-item-img { width: 100%; height: 200px; }
 }
