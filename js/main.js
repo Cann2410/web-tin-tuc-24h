@@ -97,7 +97,7 @@ function renderCategory(catId = 'home') {
         currentCatTitle = "Tin Mới Nhất";
     }
 
-    // Sắp xếp thời gian giảm dần (mới -> cũ)
+    // Sắp xếp thời gian giảm dần (Mới -> Cũ)
     filteredPosts.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
     if (filteredPosts.length === 0) {
@@ -105,17 +105,16 @@ function renderCategory(catId = 'home') {
         return;
     }
 
-    // Top section: 1 bài lớn bên trái + 2 bài nhỏ bên phải
+    // TOP SECTION: 1 BÀI LỚN BÊN TRÁI + 2 BÀI NHỎ BÊN PHẢI
     const featuredLarge = filteredPosts[0];
     const featuredSmall = filteredPosts.slice(1, 3);
     const remainingPosts = filteredPosts.slice(3);
 
     let html = `<h2 class="section-title">${currentCatTitle}</h2>`;
 
-    // TOP SECTION LAYOUT (1 LỚN - 2 NHỎ CHUẨN ĐỀ BÀI)
     html += `<div class="featured-grid">`;
 
-    // 1 bài viết lớn bên trái (featured post)
+    // 1 BÀI LỚN BÊN TRÁI (HIỂN THỊ CẢ ẢNH + TIÊU ĐỀ + SAPO TÓM TẮT)
     if (featuredLarge) {
         const defaultImg = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop";
         html += `
@@ -127,7 +126,7 @@ function renderCategory(catId = 'home') {
         `;
     }
 
-    // 2 bài viết nhỏ bên phải
+    // 2 BÀI NHỎ BÊN PHẢI (HIỂN THỊ ẢNH TRÊN, TIÊU ĐỀ DƯỚI)
     html += `<div class="featured-small-group">`;
     featuredSmall.forEach(post => {
         const defaultImgSmall = "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop";
@@ -138,15 +137,16 @@ function renderCategory(catId = 'home') {
             </div>
         `;
     });
-    html += `</div></div>`;
+    html += `</div></div>`; // Đóng featured-grid
 
-    // DANH SÁCH BÀI VIẾT CÒN LẠI (ẢNH BÊN TRÁI, TIÊU ĐỀ + SAPO BÊN PHẢI)
+    // DANH SÁCH BÀI CÒN LẠI (DẠNG HÀNG: ẢNH BÊN TRÁI, TIÊU ĐỀ + SAPO BÊN PHẢI)
     if (remainingPosts.length > 0) {
         html += `<div class="recent-list">`;
         remainingPosts.forEach(post => {
+            const defaultImgList = "https://images.unsplash.com/photo-1517649763962-0c623266010b?w=600&auto=format&fit=crop";
             html += `
                 <div class="list-item" onclick="renderArticleDetail('${post.id}')">
-                    ${post.thumbnail ? `<img src="${post.thumbnail}" class="list-img" alt="thumb">` : ''}
+                    <img src="${post.thumbnail || defaultImgList}" class="list-img" alt="thumb">
                     <div class="list-content">
                         <h4 class="list-title">${post.title}</h4>
                         <p class="list-excerpt">${post.excerpt}</p>
@@ -160,7 +160,7 @@ function renderCategory(catId = 'home') {
     app.innerHTML = html;
 }
 
-// === TRANG CHI TIẾT BÀI VIẾT (ĐỦ 6 THUỘC TÍNH THEO YÊU CẦU ĐỀ BÀI) ===
+// === TRANG CHI TIẾT BÀI VIẾT (ĐỦ 6 THUỘC TÍNH THEO ĐỀ BÀI) ===
 function renderArticleDetail(postId) {
     const app = document.getElementById('appView');
     const posts = getPosts();
