@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Tin Tức - Dantri News</title>
-    <!-- Đường dẫn CSS -->
+    <title>Dân Trí News</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
-    <!-- NAVBAR HEADER -->
+    <!-- HEADER & NAVBAR GỐC BẠN YÊU CẦU (ẢNH 9) -->
     <header>
         <div class="container nav-wrapper">
             <div class="logo" onclick="renderCategory('home')">DÂN TRÍ NEWS</div>
@@ -20,7 +19,7 @@
     <!-- NỘI DUNG CHÍNH -->
     <main class="container" id="appView"></main>
 
-    <!-- FOOTER -->
+    <!-- FOOTER GỐC CÓ ICON TRÒN (ẢNH 3) -->
     <footer>
         <div class="container">
             <div class="footer-grid">
@@ -42,12 +41,18 @@
                 </div>
                 <div class="footer-col">
                     <h4>Liên hệ</h4>
-                    <p>Email: toasoan@dantri.com.vn</p>
-                    <p>Địa chỉ: Hà Nội, Việt Nam</p>
+                    <p><b>Email:</b> toasoan@dantri.com.vn</p>
+                    <p><b>Địa chỉ:</b> Hà Nội, Việt Nam</p>
                     <div class="social-icons">
-                        <span class="social-icon-btn" title="Facebook">f</span>
-                        <span class="social-icon-btn" title="YouTube">▶</span>
-                        <span class="social-icon-btn" title="TikTok">♪</span>
+                        <a class="social-icon-btn" title="Facebook">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>
+                        </a>
+                        <a class="social-icon-btn" title="YouTube">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                        </a>
+                        <a class="social-icon-btn" title="TikTok">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.28-2.52.73-5.02 2.62-6.68 1.41-1.25 3.26-1.93 5.15-1.93.25 0 .5 0 .75.03v4.08c-.76-.08-1.53.05-2.23.38-1.12.51-1.92 1.57-2.09 2.79-.24 1.46.42 2.95 1.64 3.73 1.02.66 2.33.8 3.49.38 1.07-.37 1.88-1.32 2.06-2.43.12-.9.08-1.81.09-2.71.01-4.73 0-9.46.01-14.19z"/></svg>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -57,7 +62,6 @@
         </div>
     </footer>
 
-    <!-- FILE JAVASCRIPT -->
     <script src="./js/crawler.js"></script>
     <script src="./js/main.js"></script>
 </body>
