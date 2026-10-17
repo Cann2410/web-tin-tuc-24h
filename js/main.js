@@ -1,4 +1,4 @@
-// === 1. TẢI DỮ LIỆU BAN ĐẦU VÀO LOCALSTORAGE ===
+// === 1. TẢI VÀ QUẢN LÝ DỮ LIỆU LOCALSTORAGE ===
 async function loadInitialData() {
     try {
         const resMenu = await fetch('./data/menu.json');
@@ -6,14 +6,14 @@ async function loadInitialData() {
         if (dataMenu && dataMenu.menu) {
             localStorage.setItem('categories', JSON.stringify(dataMenu.menu));
         }
-    } catch(e) { console.error("Lỗi đọc menu.json:", e); }
+    } catch(e) { console.error("Lỗi tải menu.json:", e); }
 
     if (!localStorage.getItem('posts')) {
         try {
             const resPosts = await fetch('./data/posts.json');
             const posts = await resPosts.json();
             localStorage.setItem('posts', JSON.stringify(posts || []));
-        } catch(e) { console.error("Lỗi đọc posts.json:", e); }
+        } catch(e) { console.error("Lỗi tải posts.json:", e); }
     }
 }
 
@@ -28,7 +28,7 @@ function savePostToStorage(newPost) {
     localStorage.setItem('posts', JSON.stringify(posts));
 }
 
-// === 2. THANH ĐIỀU HƯỚNG NAVBAR ===
+// === 2.1 THANH ĐIỀU HƯỚNG (NAVBAR) ===
 function renderNavbar() {
     const categories = getCategories();
     const navMenuEl = document.getElementById('navbarMenu');
@@ -63,7 +63,7 @@ function renderNavbar() {
     if(footerCatEl) footerCatEl.innerHTML = footerHtml;
 }
 
-// === 3. TRANG DANH SÁCH BÀI VIẾT (CHUẨN 100% THEO ĐỀ BÀI) ===
+// === 2.2 TRANG DANH SÁCH BÀI VIẾT THEO CHUYÊN MỤC ===
 function renderCategory(catId = 'home') {
     const app = document.getElementById('appView');
     const posts = getPosts();
@@ -74,7 +74,7 @@ function renderCategory(catId = 'home') {
     if (activeNav) activeNav.classList.add('active');
 
     let filteredPosts = posts;
-    let currentCatTitle = "TRANG CHỦ";
+    let currentCatTitle = "Trang chủ";
 
     if (catId !== 'home' && catId !== 'latest') {
         let foundCat = categories.find(c => c.id === catId);
@@ -86,7 +86,7 @@ function renderCategory(catId = 'home') {
                 }
             });
         }
-        if (foundCat) currentCatTitle = foundCat.title.toUpperCase();
+        if (foundCat) currentCatTitle = foundCat.title;
 
         filteredPosts = posts.filter(p => {
             if (!p.category) return false;
@@ -94,10 +94,10 @@ function renderCategory(catId = 'home') {
                    p.category.toLowerCase().includes(currentCatTitle.toLowerCase());
         });
     } else if (catId === 'latest') {
-        currentCatTitle = "TIN MỚI NHẤT";
+        currentCatTitle = "Tin Mới Nhất";
     }
 
-    // Sắp xếp thời gian giảm dần (Mới -> Cũ)
+    // Sắp xếp thời gian giảm dần (mới -> cũ)
     filteredPosts.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
     if (filteredPosts.length === 0) {
@@ -105,17 +105,17 @@ function renderCategory(catId = 'home') {
         return;
     }
 
-    // TÁCH ĐÚNG: 1 bài lớn bên trái + 2 bài nhỏ bên phải
+    // Top section: 1 bài lớn bên trái + 2 bài nhỏ bên phải
     const featuredLarge = filteredPosts[0];
     const featuredSmall = filteredPosts.slice(1, 3);
     const remainingPosts = filteredPosts.slice(3);
 
     let html = `<h2 class="section-title">${currentCatTitle}</h2>`;
 
-    // GRID TOP SECTION (1 LỚN - 2 NHỎ)
+    // TOP SECTION LAYOUT (1 LỚN - 2 NHỎ CHUẨN ĐỀ BÀI)
     html += `<div class="featured-grid">`;
 
-    // 1 BÀI LỚN BÊN TRÁI
+    // 1 bài viết lớn bên trái (featured post)
     if (featuredLarge) {
         const defaultImg = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop";
         html += `
@@ -127,7 +127,7 @@ function renderCategory(catId = 'home') {
         `;
     }
 
-    // 2 BÀI NHỎ BÊN PHẢI (ẢNH TRÊN - TIÊU ĐỀ DƯỚI)
+    // 2 bài viết nhỏ bên phải
     html += `<div class="featured-small-group">`;
     featuredSmall.forEach(post => {
         const defaultImgSmall = "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop";
@@ -138,9 +138,9 @@ function renderCategory(catId = 'home') {
             </div>
         `;
     });
-    html += `</div></div>`; // Đóng featured-grid
+    html += `</div></div>`;
 
-    // CÁC BÀI VIẾT CÒN LẠI (DẠNG HÀNG: ẢNH BÊN TRÁI, TIÊU ĐỀ + SAPO BÊN PHẢI)
+    // DANH SÁCH BÀI VIẾT CÒN LẠI (ẢNH BÊN TRÁI, TIÊU ĐỀ + SAPO BÊN PHẢI)
     if (remainingPosts.length > 0) {
         html += `<div class="recent-list">`;
         remainingPosts.forEach(post => {
@@ -160,7 +160,7 @@ function renderCategory(catId = 'home') {
     app.innerHTML = html;
 }
 
-// === 4. TRANG CHI TIẾT BÀI VIẾT ===
+// === TRANG CHI TIẾT BÀI VIẾT (ĐỦ 6 THUỘC TÍNH THEO YÊU CẦU ĐỀ BÀI) ===
 function renderArticleDetail(postId) {
     const app = document.getElementById('appView');
     const posts = getPosts();
@@ -174,11 +174,11 @@ function renderArticleDetail(postId) {
     app.innerHTML = `
         <div class="article-detail">
             <div class="article-header">
-                <div class="card-category" style="color:#008837; font-weight:bold; margin-bottom:5px;">${article.category}</div>
+                <div class="card-category" style="color:#008837; font-weight:bold; margin-bottom:5px;">Chuyên mục: ${article.category}</div>
                 <h1 class="article-title-main">${article.title}</h1>
                 <div class="article-meta-info">
                     <span>Tác giả: <b>${article.author}</b></span> |
-                    <span>Ngày đăng: ${article.publishedAt}</span> |
+                    <span>Thời gian đăng: ${article.publishedAt}</span> |
                     <span>Nguồn: ${article.source}</span>
                 </div>
             </div>
@@ -192,7 +192,7 @@ function renderArticleDetail(postId) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// === 5. TRANG CRAWLER PAGE ===
+// === TRANG CRAWLER BÀI VIẾT ===
 function renderCrawlerPage() {
     const app = document.getElementById('appView');
     app.innerHTML = `
