@@ -1,18 +1,43 @@
 /**
- * PHẦN 3: CROWLER TIN TỨC DÂN TRÍ
- * Hàm getArticle(url) bóc tách dữ liệu bài viết từ Dantri.com.vn
+ * PHẦN 3: CROWLER TIN TỨC DÂN TRÍ (TỐI ƯU CƠ CHẾ ĐA PROXY DỰ PHÒNG)
  */
+
+// Hàm hỗ trợ Fetch HTML qua nhiều Proxy trung gian để chống lỗi nghẽn mạng
+async function fetchHtmlWithFallback(url) {
+    const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`
+    ];
+
+    for (const proxyUrl of proxies) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000); // Timeout 6s mỗi proxy
+
+            const response = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                const htmlText = await response.text();
+                if (htmlText && htmlText.length > 500) {
+                    return htmlText; // Trả về ngay khi lấy được HTML hợp lệ
+                }
+            }
+        } catch (e) {
+            console.warn(`Proxy ${proxyUrl} gặp sự cố, đang chuyển sang proxy dự phòng...`);
+        }
+    }
+    return null;
+}
+
 async function getArticle(url) {
     try {
-        // Sử dụng CORS Proxy để đọc HTML từ dantri.com.vn không bị chặn
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const response = await fetch(proxyUrl);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+        const htmlText = await fetchHtmlWithFallback(url);
+        if (!htmlText) {
+            throw new Error("Tất cả các CORS Proxy đều không phản hồi.");
         }
 
-        const htmlText = await response.text();
         const doc = new DOMParser().parseFromString(htmlText, 'text/html');
 
         const getText = (selector, index = 0) => {
@@ -25,36 +50,43 @@ async function getArticle(url) {
         const rawCategorySlug = pathSegments[0] || 'thoi-su';
         const fileName = pathSegments[pathSegments.length - 1] || '';
 
-        // 1. Trích xuất ID & Slug từ URL
+        // 1. Trích xuất ID & Slug
         const idMatch = fileName.match(/(\d+)\.htm/);
         const id = idMatch ? `dtri-${idMatch[1]}` : `dtri-${Date.now()}`;
         const slug = fileName.replace(/\.htm$/, '').replace(/-\d+$/, '');
 
-        // 2. Trích xuất Tiêu đề (title) theo selector Dân trí
+        // 2. Trích xuất Tiêu đề (Bổ sung linh hoạt nhiều selector)
         const title = getText('#articleContent [data-slot="title"]') || 
                       getText('h1.title-page') || 
-                      getText('h1');
+                      getText('h1') || 
+                      doc.querySelector('title')?.textContent?.replace('- Báo Dân trí', '')?.trim() || 
+                      'Chưa có tiêu đề';
 
-        // 3. Trích xuất Tóm tắt (sapo/excerpt)
+        // 3. Trích xuất Tóm tắt (Sapo)
         const excerpt = getText('#articleContent [data-slot="sapo"]') || 
                         getText('h2.singular-sapo') || 
-                        getText('.sapo');
+                        getText('.sapo') || 
+                        '';
 
-        // 4. Trích xuất Nội dung chính (content)
-        const contentEl = doc.querySelector('#articleContent [data-slot="content"], .singular-content, .article-body');
+        // 4. Trích xuất Nội dung
+        let contentEl = doc.querySelector('#articleContent [data-slot="content"]') || 
+                        doc.querySelector('.singular-content') || 
+                        doc.querySelector('.article-body') || 
+                        doc.querySelector('#articleContent');
+
         if (contentEl) {
-            // Xóa quảng cáo, video, bài viết liên quan
-            contentEl.querySelectorAll('.relate-container, .video-content-wrapper, iframe, script, style').forEach(el => el.remove());
+            contentEl = contentEl.cloneNode(true);
+            contentEl.querySelectorAll('.relate-container, .video-content-wrapper, iframe, script, style, .author-time').forEach(el => el.remove());
         }
-        const contentText = contentEl ? contentEl.textContent.trim() : "";
+        const contentText = contentEl ? contentEl.textContent.trim() : title;
 
-        // 5. Trích xuất Tác giả (author) - ưu tiên vị trí index 1 theo mẫu Dân trí
+        // 5. Trích xuất Tác giả
         let author = getText('#articleContent [rel="author"]', 1) || 
                      getText('#articleContent [rel="author"]', 0) || 
                      getText('.author-name') || 
                      'Dân trí';
 
-        // 6. Ánh xạ Chuyên mục (category) từ slug sang Tiếng Việt có dấu
+        // 6. Trích xuất Chuyên mục
         const categoryMap = {
             'thoi-su': 'Thời sự',
             'the-gioi': 'Thế giới',
@@ -72,26 +104,27 @@ async function getArticle(url) {
         };
 
         let category = doc.querySelector('ul.breadcrumbs li:last-child a, .breadcrumbs a:last-child')?.textContent?.trim() ||
-                       categoryMap[rawCategorySlug] || 'Thời sự';
+                       categoryMap[rawCategorySlug] || 'Tin tức';
 
-        // 7. Trích xuất Thời gian đăng (publishedAt) tự động, không gán cứng
+        // 7. Trích xuất Thời gian đăng
         let rawTime = getText('time') || getText('.author-time') || getText('.singular-time');
-        let publishedAt = rawTime;
+        let publishedAt = '';
         const timeMatch = rawTime.match(/(\d{2})\/(\d{2})\/(\d{4})\s*-\s*(\d{2}:\d{2})/);
         if (timeMatch) {
             const [_, day, month, year, timeStr] = timeMatch;
             publishedAt = `${year}-${month}-${day} ${timeStr}`;
-        } else if (!publishedAt) {
+        } else {
             const now = new Date();
-            publishedAt = now.toISOString().slice(0, 16).replace('T', ' ');
+            publishedAt = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
 
-        // 8. Trích xuất Ảnh đại diện (thumbnail)
+        // 8. Trích xuất Ảnh đại diện
         let thumbnail = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
+                        doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') ||
                         doc.querySelector('#articleContent img, .singular-content img')?.getAttribute('src') ||
                         'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop';
 
-        // TRẢ VỀ OBJECT DỮ LIỆU ĐÚNG 10 TRƯỜNG ĐỀ BÀI
+        // Trả về Object JSON 10 trường đúng chuẩn
         return {
             "id": id,
             "title": title,
