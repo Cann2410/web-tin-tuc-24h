@@ -1,4 +1,4 @@
-// === HIỂN THỊ LAYOUT ĐÚNG YÊU CẦU: 1 BÀI LỚN BÊN TRÁI + 2 BÀI NHỎ BÊN PHẢI ===
+// === HIỂN THỊ KHUNG 1 BÀI LỚN BÊN TRÁI + 2 BÀI NHỎ BÊN PHẢI CHUẨN 100% THEO ẢNH ===
 function renderCategory(catId = 'home') {
     const app = document.getElementById('appView');
     const posts = getPosts();
@@ -35,54 +35,50 @@ function renderCategory(catId = 'home') {
     filteredPosts.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
     if (filteredPosts.length === 0) {
-        app.innerHTML = `<h2 class="section-title">${currentCatTitle}</h2><p style="margin-top:15px;">Chưa có bài viết nào trong chuyên mục này. Hãy bấm vào <b>Crawler Page</b> để cào thêm bài viết mới!</p>`;
+        app.innerHTML = `<h2 class="section-title">${currentCatTitle}</h2><p style="margin-top:15px;">Chưa có bài viết nào trong chuyên mục này.</p>`;
         return;
     }
 
-    // TÁCH ĐÚNG 1 BÀI LỚN BÊN TRÁI VÀ 2 BÀI NHỎ BÊN PHẢI
+    // 1 BÀI LỚN BÊN TRÁI + 2 BÀI NHỎ BÊN PHẢI
     const featuredLarge = filteredPosts[0];
-    const featuredSmall = filteredPosts.slice(1, 3); // Lấy đúng 2 bài nhỏ
-    const remainingPosts = filteredPosts.slice(3);   // Các bài còn lại xếp dọc bên dưới
+    const featuredSmall = filteredPosts.slice(1, 3);
+    const remainingPosts = filteredPosts.slice(3);
 
     let html = `<h2 class="section-title">${currentCatTitle}</h2>`;
 
-    // GRID NỔI BẬT (1 LỚN BÊN TRÁI - 2 NHỎ BÊN PHẢI)
+    // GRID BÀI VIẾT NỔI BẬT (ĐÚNG THEO ẢNH MẪU)
     html += `<div class="featured-grid">`;
 
-    // 1 BÀI VIẾT LỚN BÊN TRÁI (FEATURED POST)
+    // CỘT TRÁI: 1 BÀI LỚN
     if (featuredLarge) {
+        const defaultImg = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop";
         html += `
-            <div class="card featured-large" onclick="renderArticleDetail('${featuredLarge.id}')">
-                ${featuredLarge.thumbnail ? `<img src="${featuredLarge.thumbnail}" class="card-img-large" alt="thumb">` : ''}
-                <div class="card-body">
-                    <div class="card-category">${featuredLarge.category}</div>
-                    <h3 class="card-title">${featuredLarge.title}</h3>
-                    <p class="card-excerpt">${featuredLarge.excerpt}</p>
-                    <div class="card-meta">Đăng ngày: ${featuredLarge.publishedAt} | Tác giả: ${featuredLarge.author}</div>
-                </div>
+            <div class="card-clean" onclick="renderArticleDetail('${featuredLarge.id}')">
+                <img src="${featuredLarge.thumbnail || defaultImg}" class="card-img-large" alt="thumb">
+                <div class="card-category-green">${featuredLarge.category || 'THỜI SỰ'}</div>
+                <h3 class="card-title-large-green">${featuredLarge.title}</h3>
+                <p class="card-excerpt-clean">${featuredLarge.excerpt}</p>
             </div>
         `;
     }
 
-    // 2 BÀI VIẾT NHỎ BÊN PHẢI
+    // CỘT PHẢI: 2 BÀI NHỎ (ẢNH TRÊN, TIÊU ĐỀ VÀ NGÀY GIỜ BÊN DƯỚI)
     html += `<div class="featured-small-group">`;
     featuredSmall.forEach(post => {
+        const defaultImgSmall = "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop";
         html += `
-            <div class="card card-small" onclick="renderArticleDetail('${post.id}')">
-                ${post.thumbnail ? `<img src="${post.thumbnail}" class="card-img-small" alt="thumb">` : ''}
-                <div class="card-body">
-                    <div class="card-category">${post.category}</div>
-                    <h4 class="card-title-small">${post.title}</h4>
-                    <div class="card-meta">${post.publishedAt}</div>
-                </div>
+            <div class="card-clean" onclick="renderArticleDetail('${post.id}')">
+                <img src="${post.thumbnail || defaultImgSmall}" class="card-img-small" alt="thumb">
+                <h4 class="card-title-small-clean">${post.title}</h4>
+                <div class="card-time-clean">${post.publishedAt}</div>
             </div>
         `;
     });
     html += `</div></div>`; // Đóng featured-small-group và featured-grid
 
-    // DANH SÁCH BÀI VIẾT CÒN LẠI XẾP DỌC BÊN DƯỚI
+    // CÁC BÀI VIẾT CÒN LẠI XẾP DỌC BÊN DƯỚI
     if (remainingPosts.length > 0) {
-        html += `<h3 style="margin: 25px 0 15px; font-size:18px; font-weight:bold;">Các tin khác</h3><div class="recent-list">`;
+        html += `<h3 style="margin: 30px 0 15px; font-size:18px; font-weight:bold;">Các tin khác</h3><div class="recent-list">`;
         remainingPosts.forEach(post => {
             html += `
                 <div class="list-item" onclick="renderArticleDetail('${post.id}')">
