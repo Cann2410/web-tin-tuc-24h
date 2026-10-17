@@ -59,8 +59,8 @@ function renderNavbar() {
 
     navHtml += `<li><a onclick="renderCrawlerPage()" class="btn-crawler">Crawler Page</a></li>`;
 
-    navMenuEl.innerHTML = navHtml;
-    if(footerCatEl) footerCatEl.innerHTML = footerHtml;
+    if (navMenuEl) navMenuEl.innerHTML = navHtml;
+    if (footerCatEl) footerCatEl.innerHTML = footerHtml;
 }
 
 // === 3. TẠO KHUNG BÀI VIẾT 1 LỚN + 2 NHỎ ===
@@ -72,10 +72,12 @@ function createGridHtml(postsList) {
 
     let html = `<div class="featured-grid">`;
 
-    // Bài lớn bên trái (Tiêu đề xanh, sapo Dân trí)
+    // Bài lớn bên trái (Xử lý an toàn cho excerpt)
     if (featuredLarge) {
         const defaultImg = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop";
-        const excerptText = featuredLarge.excerpt.startsWith('(Dân trí)') ? featuredLarge.excerpt : `(Dân trí) - ${featuredLarge.excerpt}`;
+        const rawExcerpt = featuredLarge.excerpt || '';
+        const excerptText = rawExcerpt.startsWith('(Dân trí)') ? rawExcerpt : (rawExcerpt ? `(Dân trí) - ${rawExcerpt}` : '');
+        
         html += `
             <div class="card-clean" onclick="renderArticleDetail('${featuredLarge.id}')">
                 <img src="${featuredLarge.thumbnail || defaultImg}" class="card-img-large" alt="thumb">
@@ -86,7 +88,7 @@ function createGridHtml(postsList) {
         `;
     }
 
-    // 2 bài nhỏ bên trái
+    // 2 bài nhỏ bên phải
     html += `<div class="featured-small-group">`;
     featuredSmall.forEach(post => {
         const defaultImgSmall = "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop";
@@ -94,7 +96,7 @@ function createGridHtml(postsList) {
             <div class="card-clean" onclick="renderArticleDetail('${post.id}')">
                 <img src="${post.thumbnail || defaultImgSmall}" class="card-img-small" alt="thumb">
                 <h4 class="card-title-small-clean">${post.title}</h4>
-                <div class="card-time-clean">${post.publishedAt}</div>
+                <div class="card-time-clean">${post.publishedAt || ''}</div>
             </div>
         `;
     });
@@ -103,9 +105,11 @@ function createGridHtml(postsList) {
     return html;
 }
 
-// === 4. HIỂN THỊ CÁC CHUYÊN MỤC GIỐNG VIDEO ===
+// === 4. HIỂN THỊ TRANG CHỦ & CHUYÊN MỤC ===
 function renderCategory(catId = 'home') {
     const app = document.getElementById('appView');
+    if (!app) return;
+
     const posts = getPosts();
     const categories = getCategories();
 
@@ -127,15 +131,18 @@ function renderCategory(catId = 'home') {
         if (listPosts.length > 0) {
             html += `<div class="recent-list">`;
             listPosts.forEach(post => {
-                const excerptText = post.excerpt.startsWith('(Dân trí)') ? post.excerpt : `(Dân trí) - ${post.excerpt}`;
+                const rawExcerpt = post.excerpt || '';
+                const excerptText = rawExcerpt.startsWith('(Dân trí)') ? rawExcerpt : (rawExcerpt ? `(Dân trí) - ${rawExcerpt}` : '');
+                const defaultImgList = "https://images.unsplash.com/photo-1517649763962-0c623266010b?w=600&auto=format&fit=crop";
+                
                 html += `
                     <div class="list-item" onclick="renderArticleDetail('${post.id}')">
-                        <img src="${post.thumbnail}" class="list-item-img" alt="thumb">
+                        <img src="${post.thumbnail || defaultImgList}" class="list-item-img" alt="thumb">
                         <div class="list-content">
                             <div class="card-category-green">${(post.category || '').toUpperCase()}</div>
                             <h4 class="list-item-title">${post.title}</h4>
                             <p class="list-item-excerpt">${excerptText}</p>
-                            <div class="list-item-meta">${post.publishedAt} ${post.author ? '· ' + post.author : ''}</div>
+                            <div class="list-item-meta">${post.publishedAt || ''} ${post.author ? '· ' + post.author : ''}</div>
                         </div>
                     </div>
                 `;
@@ -143,14 +150,14 @@ function renderCategory(catId = 'home') {
             html += `</div>`;
         }
 
-        // Tạo các khối chuyên mục (THẾ GIỚI, THỜI SỰ, PHÁP LUẬT, SỨC KHỎE,...)
+        // Tạo các khối chuyên mục
         const sectionCategories = ['Thế giới', 'Thời sự', 'Pháp luật', 'Sức khỏe', 'Đời sống', 'Du lịch', 'Kinh doanh'];
         sectionCategories.forEach(catName => {
             const catPosts = posts.filter(p => p.category && p.category.toLowerCase().includes(catName.toLowerCase()));
             if (catPosts.length > 0) {
                 html += `
                     <div class="category-block">
-                        <h3 class="category-section-title" onclick="renderCategory('${catPosts[0].category}')">${catName.toUpperCase()} <span class="arrow">&gt;</span></h3>
+                        <h3 class="category-section-title" onclick="renderCategory('${catName.toLowerCase()}')">${catName.toUpperCase()} <span class="arrow">&gt;</span></h3>
                         ${createGridHtml(catPosts)}
                     </div>
                 `;
@@ -161,7 +168,7 @@ function renderCategory(catId = 'home') {
         return;
     }
 
-    // Nếu chọn chuyên mục cụ thể
+    // Khi chọn một chuyên mục cụ thể
     let targetTitle = catId.toUpperCase();
     let filteredPosts = posts.filter(p => p.category && p.category.toLowerCase().includes(catId.toLowerCase()));
 
@@ -177,15 +184,18 @@ function renderCategory(catId = 'home') {
     if (remaining.length > 0) {
         html += `<div class="recent-list" style="margin-top:20px;">`;
         remaining.forEach(post => {
-            const excerptText = post.excerpt.startsWith('(Dân trí)') ? post.excerpt : `(Dân trí) - ${post.excerpt}`;
+            const rawExcerpt = post.excerpt || '';
+            const excerptText = rawExcerpt.startsWith('(Dân trí)') ? rawExcerpt : (rawExcerpt ? `(Dân trí) - ${rawExcerpt}` : '');
+            const defaultImgList = "https://images.unsplash.com/photo-1517649763962-0c623266010b?w=600&auto=format&fit=crop";
+
             html += `
                 <div class="list-item" onclick="renderArticleDetail('${post.id}')">
-                    <img src="${post.thumbnail}" class="list-item-img" alt="thumb">
+                    <img src="${post.thumbnail || defaultImgList}" class="list-item-img" alt="thumb">
                     <div class="list-content">
                         <div class="card-category-green">${(post.category || '').toUpperCase()}</div>
                         <h4 class="list-item-title">${post.title}</h4>
                         <p class="list-item-excerpt">${excerptText}</p>
-                        <div class="list-item-meta">${post.publishedAt} ${post.author ? '· ' + post.author : ''}</div>
+                        <div class="list-item-meta">${post.publishedAt || ''} ${post.author ? '· ' + post.author : ''}</div>
                     </div>
                 </div>
             `;
@@ -196,9 +206,11 @@ function renderCategory(catId = 'home') {
     app.innerHTML = html;
 }
 
-// === 5. TRANG CHI TIẾT BÀI VIẾT (CHUẨN THEO 00:13 TRONG VIDEO) ===
+// === 5. TRANG CHI TIẾT BÀI VIẾT ===
 function renderArticleDetail(postId) {
     const app = document.getElementById('appView');
+    if (!app) return;
+
     const posts = getPosts();
     const article = posts.find(p => p.id === postId);
 
@@ -207,20 +219,21 @@ function renderArticleDetail(postId) {
         return;
     }
 
-    const sapoText = article.excerpt.startsWith('(Dân trí)') ? article.excerpt : `(Dân trí) - ${article.excerpt}`;
+    const rawExcerpt = article.excerpt || '';
+    const sapoText = rawExcerpt.startsWith('(Dân trí)') ? rawExcerpt : (rawExcerpt ? `(Dân trí) - ${rawExcerpt}` : '');
 
     app.innerHTML = `
         <div class="article-detail">
             <h1 class="article-title-main">${article.title}</h1>
             <div class="article-meta-info">
                 <span><b>${article.author || 'Dân trí'}</b></span> · 
-                <span>${article.publishedAt}</span> · 
-                <span style="color:#008837; font-weight:bold;">${article.category}</span> · 
+                <span>${article.publishedAt || ''}</span> · 
+                <span style="color:#008837; font-weight:bold;">${article.category || ''}</span> · 
                 <span>Nguồn: ${article.source || 'dantri.com.vn'}</span>
             </div>
             <p class="article-sapo-main">${sapoText}</p>
             ${article.thumbnail ? `<img src="${article.thumbnail}" class="detail-main-img" alt="thumb">` : ''}
-            <div class="article-content-body">${article.content}</div>
+            <div class="article-content-body">${article.content || ''}</div>
             <br><hr><br>
             <a href="${article.url}" target="_blank" style="color: #008837; font-weight: bold;">[Xem bài viết gốc trên Dantri]</a>
         </div>
@@ -231,6 +244,8 @@ function renderArticleDetail(postId) {
 // === 6. TRANG CRAWLER PAGE ===
 function renderCrawlerPage() {
     const app = document.getElementById('appView');
+    if (!app) return;
+
     document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
 
     app.innerHTML = `
