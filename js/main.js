@@ -28,7 +28,7 @@ function savePostToStorage(newPost) {
     localStorage.setItem('posts', JSON.stringify(posts));
 }
 
-// === 2.21 THANH ĐIỀU HƯỚNG (NAVBAR) ===
+// === 2. THANH ĐIỀU HƯỚNG NAVBAR ===
 function renderNavbar() {
     const categories = getCategories();
     const navMenuEl = document.getElementById('navbarMenu');
@@ -63,7 +63,7 @@ function renderNavbar() {
     if(footerCatEl) footerCatEl.innerHTML = footerHtml;
 }
 
-// === 2.2 TRANG DANH SÁCH BÀI VIẾT THEO CHUYÊN MỤC ===
+// === 3. TRANG DANH SÁCH BÀI VIẾT (CHUẨN 100% THEO ĐỀ BÀI) ===
 function renderCategory(catId = 'home') {
     const app = document.getElementById('appView');
     const posts = getPosts();
@@ -74,7 +74,7 @@ function renderCategory(catId = 'home') {
     if (activeNav) activeNav.classList.add('active');
 
     let filteredPosts = posts;
-    let currentCatTitle = "Trang chủ";
+    let currentCatTitle = "TRANG CHỦ";
 
     if (catId !== 'home' && catId !== 'latest') {
         let foundCat = categories.find(c => c.id === catId);
@@ -86,7 +86,7 @@ function renderCategory(catId = 'home') {
                 }
             });
         }
-        if (foundCat) currentCatTitle = foundCat.title;
+        if (foundCat) currentCatTitle = foundCat.title.toUpperCase();
 
         filteredPosts = posts.filter(p => {
             if (!p.category) return false;
@@ -94,10 +94,10 @@ function renderCategory(catId = 'home') {
                    p.category.toLowerCase().includes(currentCatTitle.toLowerCase());
         });
     } else if (catId === 'latest') {
-        currentCatTitle = "Tin Mới Nhất";
+        currentCatTitle = "TIN MỚI NHẤT";
     }
 
-    // Sắp xếp thời gian giảm dần (mới -> cũ)
+    // Sắp xếp thời gian giảm dần (Mới -> Cũ)
     filteredPosts.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
     if (filteredPosts.length === 0) {
@@ -105,51 +105,51 @@ function renderCategory(catId = 'home') {
         return;
     }
 
-    // Top Section: 1 bài lớn bên trái + 2 bài nhỏ bên phải
+    // TÁCH ĐÚNG: 1 bài lớn bên trái + 2 bài nhỏ bên phải
     const featuredLarge = filteredPosts[0];
     const featuredSmall = filteredPosts.slice(1, 3);
     const remainingPosts = filteredPosts.slice(3);
 
     let html = `<h2 class="section-title">${currentCatTitle}</h2>`;
 
-    // LAYOUT TOP SECTION (ĐÚNG MẪU TRONG ẢNH 2)
+    // GRID TOP SECTION (1 LỚN - 2 NHỎ)
     html += `<div class="featured-grid">`;
 
-    // 1 bài viết lớn bên trái (featured post)
+    // 1 BÀI LỚN BÊN TRÁI
     if (featuredLarge) {
         const defaultImg = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop";
         html += `
             <div class="card-featured-large" onclick="renderArticleDetail('${featuredLarge.id}')">
-                <img src="${featuredLarge.thumbnail || defaultImg}" class="card-img-large" alt="thumb">
-                <h3 class="card-title-large">${featuredLarge.title}</h3>
-                <p class="card-excerpt-large">${featuredLarge.excerpt}</p>
+                <img src="${featuredLarge.thumbnail || defaultImg}" class="img-large" alt="thumb">
+                <h3 class="title-large">${featuredLarge.title}</h3>
+                <p class="excerpt-large">${featuredLarge.excerpt}</p>
             </div>
         `;
     }
 
-    // 2 bài viết nhỏ bên phải
+    // 2 BÀI NHỎ BÊN PHẢI (ẢNH TRÊN - TIÊU ĐỀ DƯỚI)
     html += `<div class="featured-small-group">`;
     featuredSmall.forEach(post => {
         const defaultImgSmall = "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop";
         html += `
             <div class="card-featured-small" onclick="renderArticleDetail('${post.id}')">
-                <img src="${post.thumbnail || defaultImgSmall}" class="card-img-small" alt="thumb">
-                <h4 class="card-title-small">${post.title}</h4>
+                <img src="${post.thumbnail || defaultImgSmall}" class="img-small" alt="thumb">
+                <h4 class="title-small">${post.title}</h4>
             </div>
         `;
     });
-    html += `</div></div>`; // Đóng featured-small-group và featured-grid
+    html += `</div></div>`; // Đóng featured-grid
 
-    // DANH SÁCH BÀI VIẾT CÒN LẠI (ĐÚNG MẪU DẠNG HÀNG TRONG ẢNH 3)
+    // CÁC BÀI VIẾT CÒN LẠI (DẠNG HÀNG: ẢNH BÊN TRÁI, TIÊU ĐỀ + SAPO BÊN PHẢI)
     if (remainingPosts.length > 0) {
         html += `<div class="recent-list">`;
         remainingPosts.forEach(post => {
             html += `
                 <div class="list-item" onclick="renderArticleDetail('${post.id}')">
-                    ${post.thumbnail ? `<img src="${post.thumbnail}" class="list-item-img" alt="thumb">` : ''}
+                    ${post.thumbnail ? `<img src="${post.thumbnail}" class="list-img" alt="thumb">` : ''}
                     <div class="list-content">
-                        <h4 class="list-item-title">${post.title}</h4>
-                        <p class="list-item-excerpt">${post.excerpt}</p>
+                        <h4 class="list-title">${post.title}</h4>
+                        <p class="list-excerpt">${post.excerpt}</p>
                     </div>
                 </div>
             `;
@@ -160,7 +160,7 @@ function renderCategory(catId = 'home') {
     app.innerHTML = html;
 }
 
-// === TRANG CHI TIẾT BÀI VIẾT (ĐỦ 6 TRƯỜNG THEO ĐỀ BÀI) ===
+// === 4. TRANG CHI TIẾT BÀI VIẾT ===
 function renderArticleDetail(postId) {
     const app = document.getElementById('appView');
     const posts = getPosts();
@@ -174,15 +174,15 @@ function renderArticleDetail(postId) {
     app.innerHTML = `
         <div class="article-detail">
             <div class="article-header">
-                <div class="card-category">${article.category}</div>
+                <div class="card-category" style="color:#008837; font-weight:bold; margin-bottom:5px;">${article.category}</div>
                 <h1 class="article-title-main">${article.title}</h1>
                 <div class="article-meta-info">
                     <span>Tác giả: <b>${article.author}</b></span> |
-                    <span>Đăng ngày: ${article.publishedAt}</span> |
+                    <span>Ngày đăng: ${article.publishedAt}</span> |
                     <span>Nguồn: ${article.source}</span>
                 </div>
             </div>
-            ${article.thumbnail ? `<img src="${article.thumbnail}" class="detail-main-img" alt="thumb">` : ''}
+            ${article.thumbnail ? `<img src="${article.thumbnail}" style="width:100%; max-height:450px; object-fit:cover; border-radius:6px; margin-bottom:20px;">` : ''}
             ${article.excerpt ? `<p class="article-excerpt-main">${article.excerpt}</p>` : ''}
             <div class="article-content-body">${article.content}</div>
             <br><hr><br>
@@ -192,7 +192,7 @@ function renderArticleDetail(postId) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// === TRANG CRAWLER TIN TỨC ===
+// === 5. TRANG CRAWLER PAGE ===
 function renderCrawlerPage() {
     const app = document.getElementById('appView');
     app.innerHTML = `
