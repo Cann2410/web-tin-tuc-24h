@@ -20,11 +20,15 @@ async function loadInitialData() {
 function getPosts() { return JSON.parse(localStorage.getItem('posts')) || []; }
 function getCategories() { return JSON.parse(localStorage.getItem('categories')) || []; }
 
+// LƯU BÀI VIẾT CRAWL ĐƯỢC VÀO LOCALSTORAGE
 function savePostToStorage(newPost) {
     const posts = getPosts();
     const index = posts.findIndex(p => p.id === newPost.id);
-    if (index >= 0) { posts[index] = newPost; } 
-    else { posts.unshift(newPost); }
+    if (index >= 0) { 
+        posts[index] = newPost; 
+    } else { 
+        posts.unshift(newPost); // Thêm bài mới lên đầu danh sách
+    }
     localStorage.setItem('posts', JSON.stringify(posts));
 }
 
@@ -57,6 +61,7 @@ function renderNavbar() {
         footerHtml += `<li><a onclick="renderCategory('${cat.id}')">${cat.title}</a></li>`;
     });
 
+    // Nút chuyển sang Crawler Page riêng biệt
     navHtml += `<li><a onclick="renderCrawlerPage()" class="btn-crawler">Crawler Page</a></li>`;
 
     navMenuEl.innerHTML = navHtml;
@@ -97,15 +102,15 @@ function renderCategory(catId = 'home') {
         currentCatTitle = "Tin Mới Nhất";
     }
 
-    // Sắp xếp thời gian giảm dần (Mới -> Cũ)
+    // Sắp xếp theo thời gian giảm dần (mới -> cũ)
     filteredPosts.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
     if (filteredPosts.length === 0) {
-        app.innerHTML = `<h2 class="section-title">${currentCatTitle}</h2><p style="margin-top:15px;">Chưa có bài viết nào trong chuyên mục này.</p>`;
+        app.innerHTML = `<h2 class="section-title">${currentCatTitle}</h2><p style="margin-top:15px;">Chưa có bài viết nào trong chuyên mục này. Hãy bấm vào <b>Crawler Page</b> để cào thêm bài viết mới!</p>`;
         return;
     }
 
-    // TOP SECTION: 1 BÀI LỚN BÊN TRÁI + 2 BÀI NHỎ BÊN PHẢI
+    // Top section: 1 bài lớn bên trái + 2 bài nhỏ bên phải
     const featuredLarge = filteredPosts[0];
     const featuredSmall = filteredPosts.slice(1, 3);
     const remainingPosts = filteredPosts.slice(3);
@@ -114,7 +119,7 @@ function renderCategory(catId = 'home') {
 
     html += `<div class="featured-grid">`;
 
-    // 1 BÀI LỚN BÊN TRÁI (HIỂN THỊ CẢ ẢNH + TIÊU ĐỀ + SAPO TÓM TẮT)
+    // 1 bài viết lớn bên trái (featured post)
     if (featuredLarge) {
         const defaultImg = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop";
         html += `
@@ -126,7 +131,7 @@ function renderCategory(catId = 'home') {
         `;
     }
 
-    // 2 BÀI NHỎ BÊN PHẢI (HIỂN THỊ ẢNH TRÊN, TIÊU ĐỀ DƯỚI)
+    // 2 bài viết nhỏ bên phải
     html += `<div class="featured-small-group">`;
     featuredSmall.forEach(post => {
         const defaultImgSmall = "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop";
@@ -137,9 +142,9 @@ function renderCategory(catId = 'home') {
             </div>
         `;
     });
-    html += `</div></div>`; // Đóng featured-grid
+    html += `</div></div>`;
 
-    // DANH SÁCH BÀI CÒN LẠI (DẠNG HÀNG: ẢNH BÊN TRÁI, TIÊU ĐỀ + SAPO BÊN PHẢI)
+    // Danh sách bài viết còn lại (Ảnh bên trái, Tiêu đề + Sapo bên phải)
     if (remainingPosts.length > 0) {
         html += `<div class="recent-list">`;
         remainingPosts.forEach(post => {
@@ -160,7 +165,7 @@ function renderCategory(catId = 'home') {
     app.innerHTML = html;
 }
 
-// === TRANG CHI TIẾT BÀI VIẾT (ĐỦ 6 THUỘC TÍNH THEO ĐỀ BÀI) ===
+// === TRANG CHI TIẾT BÀI VIẾT ===
 function renderArticleDetail(postId) {
     const app = document.getElementById('appView');
     const posts = getPosts();
@@ -192,23 +197,26 @@ function renderArticleDetail(postId) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// === TRANG CRAWLER BÀI VIẾT ===
+// === PHẦN 3: GIAO DIỆN TRANG CRAWLER PAGE ===
 function renderCrawlerPage() {
     const app = document.getElementById('appView');
+    document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
+
     app.innerHTML = `
         <div class="crawler-box">
-            <h2 class="section-title">Chức năng Crawler Bài viết</h2>
-            <p style="margin-bottom: 15px;">Nhập URL bài viết từ website Dantri.com.vn để tự động bóc tách dữ liệu:</p>
+            <h2 class="section-title">Chức năng Crawler Tin Tức</h2>
+            <p style="margin-bottom: 15px; color: #555;">Nhập URL bài viết từ website <b>Dantri.com.vn</b> để tự động bóc tách dữ liệu JSON:</p>
             
             <div class="form-group">
                 <label for="crawlUrl">Đường dẫn bài viết (URL):</label>
-                <input type="text" id="crawlUrl" placeholder="https://dantri.com.vn/thoi-su/tong-bi-thu-chu-tich-nuoc-phap-luat-phai-du-on-dinh-de-nguoi-dan-yen-tam-20260928141449559.htm">
+                <input type="text" id="crawlUrl" placeholder="https://dantri.com.vn/bat-dong-san/ha-noi-tinh-co-che-boi-thuong-dat-dac-biet-cho-7-du-an-duong-sat-20260928122246655.htm">
             </div>
             <button class="btn-submit" onclick="handleCrawl()">Bắt đầu Cào Dữ Liệu</button>
 
             <div id="crawlerStatus" style="margin-top: 15px; font-weight: bold;"></div>
+            
             <div id="jsonPreviewContainer" style="display:none;">
-                <h3 style="margin-top: 20px;">Kết quả JSON Trích xuất:</h3>
+                <h3 style="margin-top: 20px; font-size: 18px;">Kết quả JSON Trích xuất (Chuẩn 10 trường đề bài):</h3>
                 <pre class="json-preview" id="jsonPreview"></pre>
                 <button class="btn-submit" style="background: #28a745; margin-top: 15px;" onclick="saveCrawledArticle()">Lưu Bài Viết Vào LocalStorage</button>
             </div>
@@ -218,16 +226,17 @@ function renderCrawlerPage() {
 
 let tempCrawledPost = null;
 
+// XỬ LÝ SỰ KIỆN CÀO DỮ LIỆU
 async function handleCrawl() {
     const urlInput = document.getElementById('crawlUrl').value.trim();
     const statusEl = document.getElementById('crawlerStatus');
     const previewContainer = document.getElementById('jsonPreviewContainer');
     const jsonPreview = document.getElementById('jsonPreview');
 
-    if (!urlInput) { alert("Vui lòng nhập URL!"); return; }
+    if (!urlInput) { alert("Vui lòng nhập đường dẫn URL!"); return; }
 
     statusEl.style.color = "orange";
-    statusEl.innerText = "Đang cào dữ liệu bài viết...";
+    statusEl.innerText = "Đang kết nối và cào dữ liệu từ Dantri...";
     previewContainer.style.display = "none";
 
     const result = await getArticle(urlInput);
@@ -235,20 +244,21 @@ async function handleCrawl() {
     if (result) {
         tempCrawledPost = result;
         statusEl.style.color = "green";
-        statusEl.innerText = "Trích xuất bài viết thành công!";
+        statusEl.innerText = "Cào dữ liệu thành công!";
         jsonPreview.innerText = JSON.stringify(result, null, 2);
         previewContainer.style.display = "block";
     } else {
         statusEl.style.color = "red";
-        statusEl.innerText = "Không thể cào bài viết. Vui lòng kiểm tra lại URL!";
+        statusEl.innerText = "Không thể cào bài viết. Vui lòng kiểm tra lại đường dẫn URL!";
     }
 }
 
+// XỬ LÝ LƯU BÀI VIẾT VÀO LOCALSTORAGE
 function saveCrawledArticle() {
     if (tempCrawledPost) {
         savePostToStorage(tempCrawledPost);
-        alert("Đã lưu bài viết vào LocalStorage!");
-        renderCategory('home');
+        alert("Đã lưu bài viết thành công vào LocalStorage!");
+        renderCategory('home'); // Quay lại trang chủ hiển thị bài viết mới
     }
 }
 
